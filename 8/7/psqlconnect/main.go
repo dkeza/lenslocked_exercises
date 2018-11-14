@@ -16,21 +16,31 @@ const (
 )
 
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	var (
+		id       int
+		psqlInfo string
+		err      error
+		db       *sql.DB
+		row      *sql.Row
+	)
+	psqlInfo = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Ping()
+	defer db.Close()
+
+	row = db.QueryRow(`
+			INSERT INTO users (name, email) 
+				VALUES ($1, $2) RETURNING id
+		`, "My Name", "my@name.com")
+	err = row.Scan(&id)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Connected")
-
-	db.Close()
-
+	fmt.Println(id)
 }
