@@ -11,7 +11,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "3000"
+	password = ""
 	dbname   = "lenslocked_dev"
 )
 
