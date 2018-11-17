@@ -11,7 +11,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "3000"
+	password = ""
 	dbname   = "lenslocked_dev"
 )
 
@@ -37,25 +37,20 @@ func main() {
 
 	db.LogMode(true)
 	//db.DropTableIfExists(&User{})
-	db.AutoMigrate(&User{})
+	//db.AutoMigrate(&User{})
 
 	var u User
-	var users []User
 
-	db.First(&u)
-
+	if err := db.Where("email = ?", "noemail@email.com").First(&u).Error; err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			fmt.Println("User not found")
+		case gorm.ErrInvalidSQL:
+			fmt.Println("Invalid SQL")
+		default:
+			panic(err)
+		}
+	}
 	fmt.Println(u)
-
-	db.Last(&u)
-
-	fmt.Println(u)
-
-	db.Find(&users)
-
-	fmt.Println(users)
-
-	db.Where("id > ?", 1).Find(&users)
-
-	fmt.Println(users)
 
 }
